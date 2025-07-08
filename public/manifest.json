@@ -1,0 +1,13 @@
+{
+  "name": "Finanse App",
+  "short_name": "Finanse",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "PWA do zarządzania finansami",
+  "icons": [{
+    "src": "icon.jpg",
+    "type": "image/jpg",
+    "sizes": "192x192"
+  }]
+}

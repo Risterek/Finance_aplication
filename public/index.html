@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finanse App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>Moje finanse</h1>
+
+<form id="transaction-form">
+  <input type="text" id="description" placeholder="Opis" required />
+  <input type="number" id="amount" placeholder="Kwota" required step="0.01" />
+  <select id="category" required>
+    <option value="" disabled selected>Wybierz kategorię</option>
+    <option value="Jedzenie">Jedzenie</option>
+    <option value="Transport">Transport</option>
+    <option value="Rozrywka">Rozrywka</option>
+    <option value="Inne">Inne</option>
+  </select>
+  <button type="submit">Dodaj</button>
+</form>
+
+
+  <h2>Lista transakcji</h2>
+  <div id="transactions-list">
+    <!-- Transakcje pojawią się tutaj -->
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
