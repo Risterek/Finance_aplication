@@ -7,59 +7,62 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Budżetowanie
-  let budget = localStorage.getItem('budget') ? parseFloat(localStorage.getItem('budget')) : 0;
-
-  document.getElementById('set-budget').addEventListener('click', () => {
-    const input = document.getElementById('budget-input');
-    const value = parseFloat(input.value);
-    if (!isNaN(value) && value >= 0) {
-      budget = value;
-      localStorage.setItem('budget', budget);
-      showBudgetInfo();
-      input.value = '';
-    } else {
-      alert('Podaj poprawną wartość budżetu');
-    }
-  });
-
-  function showBudgetInfo() {
-    const info = document.getElementById('budget-info');
-    // Oblicz sumę transakcji (kwoty)
-    let total = 0;
-    transactionsList.querySelectorAll('.transaction').forEach(t => {
-      const amountText = t.querySelector('div:nth-child(2)').textContent;
-      const amount = parseFloat(amountText.replace(/[^\d.-]/g, ''));
-      total += amount;
-    });
-
-    if (budget > 0) {
-      if (total > budget) {
-        info.textContent = `⚠️ Przekroczono budżet! Limit: ${budget} zł, Wydano: ${total.toFixed(2)} zł`;
-        info.style.color = 'red';
-      } else {
-        info.textContent = `✅ Pozostało: ${(budget - total).toFixed(2)} zł z budżetu ${budget} zł`;
-        info.style.color = 'green';
-      }
-    } else {
-      info.textContent = 'Brak ustawionego budżetu';
-      info.style.color = 'gray';
-    }
-  }
+  let categoryChart; // zmienna do wykresu
 
   // Funkcja do wyświetlania jednej transakcji
   function renderTransaction(transaction) {
     return `
       <div class="transaction">
         <div><strong>Opis:</strong> ${transaction.description}</div>
-        <div><strong>Kwota:</strong> ${transaction.amount.toFixed(2)} zł</div>
+        <div><strong>Kwota:</strong> ${transaction.amount} zł</div>
         <div><strong>Kategoria:</strong> <em>${transaction.category}</em></div>
         <hr>
       </div>
     `;
   }
 
-  // Funkcja do ładowania i wyświetlania transakcji z backendu
+  // Funkcja do rysowania wykresu wydatków wg kategorii
+  function renderChart(transactions) {
+    // Grupujemy sumy wydatków wg kategorii
+    const sums = {};
+    transactions.forEach(({ category, amount }) => {
+      if (!sums[category]) sums[category] = 0;
+      if (amount < 0) sums[category] += Math.abs(amount); // tylko wydatki
+    });
+
+    const labels = Object.keys(sums);
+    const data = Object.values(sums);
+
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+
+    if (categoryChart) {
+      categoryChart.destroy(); // usuń poprzedni wykres
+    }
+
+    categoryChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Wydatki (PLN)',
+          data,
+          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  // Funkcja do pobierania i wyświetlania transakcji
   async function loadTransactions() {
     try {
       const res = await fetch('/api/transaction');
@@ -67,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await res.json();
       transactionsList.innerHTML = data.map(renderTransaction).join('');
-      showBudgetInfo();
+      renderChart(data); // rysuj wykres
     } catch (err) {
       transactionsList.innerHTML = `<p style="color:red;">${err.message}</p>`;
     }
