@@ -1,72 +1,59 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const path = require('path');
 
+dotenv.config();
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Serwowanie statycznych plików z public/
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Połączenie z MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI, {
+// Połączenie z MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ Połączono z MongoDB Atlas"))
-.catch(err => console.error("❌ Błąd połączenia:", err));
+  useUnifiedTopology: true
+}).then(() => {
+  console.log("✅ Połączono z MongoDB");
+}).catch(err => {
+  console.error("❌ Błąd połączenia:", err);
+});
 
-// Model transakcji z kategorią
 const transactionSchema = new mongoose.Schema({
   description: String,
   amount: Number,
-  category: String,        // <-- nowe pole
-  createdAt: { type: Date, default: Date.now }
+  category: String,
 });
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
-// Endpoint do dodawania transakcji z kategorią
-app.post('/api/transaction', async (req, res) => {
-  const { description, amount, category } = req.body;
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-  if (!description || isNaN(amount) || !category) {
-    return res.status(400).json({ error: 'Nieprawidłowe dane' });
-  }
-
-  try {
-    const newTransaction = new Transaction({ description, amount, category });
-    await newTransaction.save();
-    console.log("📥 Otrzymano dane:", newTransaction);
-    res.status(201).json({ message: 'Dodano transakcję' });
-  } catch (err) {
-    console.error("❌ Błąd zapisu do bazy:", err);
-    res.status(500).json({ error: 'Błąd serwera' });
-  }
-});
-
-// Endpoint do pobierania wszystkich transakcji
+// Endpointy API
 app.get('/api/transaction', async (req, res) => {
   try {
-    const transactions = await Transaction.find().sort({ createdAt: -1 });
+    const transactions = await Transaction.find();
     res.json(transactions);
   } catch (err) {
-    console.error("❌ Błąd pobierania transakcji:", err);
-    res.status(500).json({ error: 'Błąd serwera' });
+    res.status(500).json({ error: 'Błąd pobierania transakcji' });
   }
 });
 
-// Start serwera
-app.listen(PORT, () => {
-  console.log(`🌍 Serwer działa na porcie: ${PORT}`);
+app.post('/api/transaction', async (req, res) => {
+  try {
+    const { description, amount, category } = req.body;
+    const newTransaction = new Transaction({ description, amount, category });
+    await newTransaction.save();
+    res.status(201).json(newTransaction);
+  } catch (err) {
+    res.status(500).json({ error: 'Błąd zapisywania transakcji' });
+  }
 });
 
+// Nowy endpoint: podsumowanie kategorii
 app.get('/api/summary', async (req, res) => {
   try {
     const transactions = await Transaction.find();
@@ -87,3 +74,7 @@ app.get('/api/summary', async (req, res) => {
   }
 });
 
+// Start serwera
+app.listen(PORT, () => {
+  console.log(`🌍 Serwer działa na porcie: ${PORT}`);
+});
