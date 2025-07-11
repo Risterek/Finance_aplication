@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Finanse App</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -24,14 +23,20 @@
     <button type="submit">Dodaj</button>
   </form>
 
+  <!-- Sekcja budżetu -->
+  <section id="budget-section">
+    <h3>Ustaw miesięczny budżet</h3>
+    <input type="number" id="budget-input" placeholder="Np. 2000 zł" />
+    <button id="set-budget">Ustaw budżet</button>
+    <p id="budget-info" style="color: gray;">Brak ustawionego budżetu</p>
+  </section>
+
   <h2>Lista transakcji</h2>
   <div id="transactions-list">
     <!-- Transakcje pojawią się tutaj -->
   </div>
 
-  <h2>Podsumowanie kategorii</h2>
-  <canvas id="summary-chart" width="400" height="400"></canvas>
-
+  <!-- Tutaj masz swój istniejący skrypt -->
   <script src="script.js"></script>
 </body>
 </html>
