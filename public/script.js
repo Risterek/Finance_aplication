@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const balanceDisplay = document.getElementById('balance');
   const budgetRemainingDisplay = document.getElementById('budget-remaining');
 
-  let categoryChart, pieChart;
+  let pieChart;
   let currentBudget = 0;
 
   if (localStorage.getItem('budget')) {
@@ -28,39 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <hr>
       </div>
     `;
-  }
-
-  function renderCategoryChart(transactions) {
-    const sums = {};
-    transactions.forEach(({ category, amount, type }) => {
-      if (type === 'expense') {
-        sums[category] = (sums[category] || 0) + Math.abs(amount);
-      }
-    });
-
-    const labels = Object.keys(sums);
-    const data = Object.values(sums);
-
-    const ctx = document.getElementById('categoryChart').getContext('2d');
-    if (categoryChart) categoryChart.destroy();
-
-    categoryChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Wydatki (PLN)',
-          data,
-          backgroundColor: 'rgba(255, 99, 132, 0.7)',
-          borderColor: 'rgba(255, 99, 132, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } }
-      }
-    });
   }
 
   function renderPieChart(transactions) {
@@ -82,14 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
       data: {
         labels,
         datasets: [{
+          label: 'Wydatki',
           data,
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+          backgroundColor: [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+          ],
           borderColor: '#fff',
           borderWidth: 2
         }]
       },
       options: {
-        responsive: true,
+        responsive: true
       }
     });
   }
@@ -119,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await res.json();
       transactionsList.innerHTML = data.map(renderTransaction).join('');
-      renderCategoryChart(data);
       renderPieChart(data);
       updateSummary(data);
     } catch (err) {
@@ -152,8 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (type === 'expense') amount = -Math.abs(amount);
-    if (type === 'income') amount = Math.abs(amount);
+    if (type === 'expense' && amount > 0) amount = -amount;
+    if (type === 'income' && amount < 0) amount = Math.abs(amount);
 
     try {
       const res = await fetch('/api/transaction', {
