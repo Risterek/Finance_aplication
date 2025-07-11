@@ -10,19 +10,18 @@
 
   <h1>Moje finanse</h1>
 
-<form id="transaction-form">
-  <input type="text" id="description" placeholder="Opis" required />
-  <input type="number" id="amount" placeholder="Kwota" required step="0.01" />
-  <select id="category" required>
-    <option value="" disabled selected>Wybierz kategorię</option>
-    <option value="Jedzenie">Jedzenie</option>
-    <option value="Transport">Transport</option>
-    <option value="Rozrywka">Rozrywka</option>
-    <option value="Inne">Inne</option>
-  </select>
-  <button type="submit">Dodaj</button>
-</form>
-
+  <form id="transaction-form">
+    <input type="text" id="description" placeholder="Opis" required />
+    <input type="number" id="amount" placeholder="Kwota" required step="0.01" />
+    <select id="category" required>
+      <option value="" disabled selected>Wybierz kategorię</option>
+      <option value="Jedzenie">Jedzenie</option>
+      <option value="Transport">Transport</option>
+      <option value="Rozrywka">Rozrywka</option>
+      <option value="Inne">Inne</option>
+    </select>
+    <button type="submit">Dodaj</button>
+  </form>
 
   <h2>Lista transakcji</h2>
   <div id="transactions-list">
@@ -30,11 +29,10 @@
   </div>
 
   <h2>Podsumowanie kategorii</h2>
-    <div id="summary">
-    <!-- Tutaj pojawią się dane -->
-    </div>
+  <div id="summary">
+    <!-- Tu pojawi się podsumowanie -->
+  </div>
 
-  
-  <script src="/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
