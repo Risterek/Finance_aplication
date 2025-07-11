@@ -1,80 +1,103 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const path = require('path');
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('transaction-form');
+  const transactionsList = document.getElementById('transactions-list');
+  const budgetInput = document.getElementById('budget-input');
+  const setBudgetBtn = document.getElementById('set-budget-btn');
+  const currentBudgetDisplay = document.getElementById('current-budget');
+  const totalExpensesDisplay = document.getElementById('total-expenses');
+  const totalIncomesDisplay = document.getElementById('total-incomes');
+  const balanceDisplay = document.getElementById('balance');
+  const budgetRemainingDisplay = document.getElementById('budget-remaining');
 
-dotenv.config();
+  let categoryChart, pieChart;
+  let currentBudget = 0;
 
-const app = express();
-const PORT = process.env.PORT || 10000;
-
-// Połączenie z MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log("✅ Połączono z MongoDB");
-}).catch(err => {
-  console.error("❌ Błąd połączenia:", err);
-});
-
-const transactionSchema = new mongoose.Schema({
-  description: String,
-  amount: Number,
-  category: String,
-});
-
-const Transaction = mongoose.model('Transaction', transactionSchema);
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Endpointy API
-app.get('/api/transaction', async (req, res) => {
-  try {
-    const transactions = await Transaction.find();
-    res.json(transactions);
-  } catch (err) {
-    res.status(500).json({ error: 'Błąd pobierania transakcji' });
+  if (localStorage.getItem('budget')) {
+    currentBudget = parseFloat(localStorage.getItem('budget'));
+    currentBudgetDisplay.textContent = currentBudget.toFixed(2);
   }
-});
 
-app.post('/api/transaction', async (req, res) => {
-  try {
-    const { description, amount, category } = req.body;
-    const newTransaction = new Transaction({ description, amount, category });
-    await newTransaction.save();
-    res.status(201).json(newTransaction);
-  } catch (err) {
-    res.status(500).json({ error: 'Błąd zapisywania transakcji' });
+  function renderTransaction(transaction) {
+    const sign = transaction.type === 'expense' ? '-' : '+';
+    return `
+      <div class="transaction">
+        <div><strong>Opis:</strong> ${transaction.description}</div>
+        <div><strong>Kwota:</strong> ${sign}${Math.abs(transaction.amount).toFixed(2)} zł</div>
+        <div><strong>Kategoria:</strong> <em>${transaction.category}</em></div>
+        <div><strong>Typ:</strong> ${transaction.type === 'expense' ? 'Wydatek' : 'Przychód'}</div>
+        <hr>
+      </div>
+    `;
   }
-});
 
-// Nowy endpoint: podsumowanie kategorii
-app.get('/api/summary', async (req, res) => {
-  try {
-    const transactions = await Transaction.find();
-
-    const summary = {};
-
-    transactions.forEach(t => {
-      if (!summary[t.category]) {
-        summary[t.category] = 0;
+  function renderCategoryChart(transactions) {
+    const sums = {};
+    transactions.forEach(({ category, amount, type }) => {
+      if (type === 'expense') {
+        sums[category] = (sums[category] || 0) + Math.abs(amount);
       }
-      summary[t.category] += t.amount;
     });
 
-    res.json(summary);
-  } catch (err) {
-    console.error("❌ Błąd podczas generowania podsumowania:", err.message);
-    res.status(500).json({ error: "Błąd serwera" });
-  }
-});
+    const labels = Object.keys(sums);
+    const data = Object.values(sums);
 
-// Start serwera
-app.listen(PORT, () => {
-  console.log(`🌍 Serwer działa na porcie: ${PORT}`);
-});
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    if (categoryChart) categoryChart.destroy();
+
+    categoryChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Wydatki (PLN)',
+          data,
+          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  function renderPieChart(transactions) {
+    const sums = {};
+    transactions.forEach(({ category, amount, type }) => {
+      if (type === 'expense') {
+        sums[category] = (sums[category] || 0) + Math.abs(amount);
+      }
+    });
+
+    const labels = Object.keys(sums);
+    const data = Object.values(sums);
+
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    if (pieChart) pieChart.destroy();
+
+    pieChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+      }
+    });
+  }
+
+  function updateSummary(transactions) {
+    let totalExpenses = 0;
+    let totalIncomes = 0;
+
+    transactions.forEach(({ amount, type }) => {
+      if (type === 'expense') totalExpenses += Math.abs(amount);
+      else totalIncomes += am
