@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Funkcja do wyświetlania jednej transakcji 2
   function renderTransaction(transaction) {
     return `
       <div class="transaction">
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
-  // Funkcja do ładowania i wyświetlania transakcji z backendu
   async function loadTransactions() {
     try {
       const res = await fetch('/api/transaction');
@@ -34,7 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Obsługa formularza
+  async function loadSummary() {
+    const summaryContainer = document.getElementById('summary');
+    summaryContainer.innerHTML = 'Ładowanie...';
+
+    try {
+      const res = await fetch('/api/summary');
+      if (!res.ok) throw new Error('Błąd ładowania podsumowania');
+
+      const data = await res.json();
+
+      const summaryHtml = Object.entries(data)
+        .map(([category, total]) => `<p><strong>${category}:</strong> ${total} zł</p>`)
+        .join('');
+
+      summaryContainer.innerHTML = summaryHtml;
+
+    } catch (err) {
+      summaryContainer.innerHTML = `<p style="color:red;">${err.message}</p>`;
+    }
+  }
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
@@ -58,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       form.reset();
       loadTransactions();
+      loadSummary(); // odśwież po dodaniu
 
     } catch (err) {
       alert(err.message);
@@ -65,4 +84,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   loadTransactions();
+  loadSummary();
 });
