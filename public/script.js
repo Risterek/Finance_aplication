@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Funkcja do wyświetlania jednej transakcji
   function renderTransaction(transaction) {
     return `
       <div class="transaction">
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
+  // Funkcja do ładowania i wyświetlania transakcji z backendu
   async function loadTransactions() {
     try {
       const res = await fetch('/api/transaction');
@@ -32,27 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function loadSummary() {
-    const summaryContainer = document.getElementById('summary');
-    summaryContainer.innerHTML = 'Ładowanie...';
-
-    try {
-      const res = await fetch('/api/summary');
-      if (!res.ok) throw new Error('Błąd ładowania podsumowania');
-
-      const data = await res.json();
-
-      const summaryHtml = Object.entries(data)
-        .map(([category, total]) => `<p><strong>${category}:</strong> ${total} zł</p>`)
-        .join('');
-
-      summaryContainer.innerHTML = summaryHtml;
-
-    } catch (err) {
-      summaryContainer.innerHTML = `<p style="color:red;">${err.message}</p>`;
-    }
-  }
-
+  // Obsługa formularza
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
@@ -75,14 +57,64 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error('Błąd podczas dodawania transakcji');
 
       form.reset();
-      loadTransactions();
-      loadSummary(); // odśwież po dodaniu
+      await loadTransactions();
+      await renderChart(); // aktualizuj wykres po dodaniu nowej transakcji
 
     } catch (err) {
       alert(err.message);
     }
   });
 
+  // Funkcja do rysowania wykresu
+  async function renderChart() {
+    try {
+      const res = await fetch('/api/summary');
+      const summary = await res.json();
+
+      const categories = Object.keys(summary);
+      const values = Object.values(summary);
+
+      const ctx = document.getElementById('summary-chart').getContext('2d');
+
+      // Usuń poprzedni wykres, jeśli istnieje
+      if (window.categoryChart) {
+        window.categoryChart.destroy();
+      }
+
+      window.categoryChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: categories,
+          datasets: [{
+            label: 'Wydatki według kategorii',
+            data: values,
+            backgroundColor: [
+              '#FF6384', // Jedzenie
+              '#36A2EB', // Transport
+              '#FFCE56', // Rozrywka
+              '#4BC0C0', // Inne
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            title: {
+              display: true,
+              text: 'Wydatki według kategorii'
+            }
+          }
+        }
+      });
+
+    } catch (err) {
+      console.error('Błąd pobierania danych do wykresu:', err);
+    }
+  }
+
   loadTransactions();
-  loadSummary();
+  renderChart();
 });
