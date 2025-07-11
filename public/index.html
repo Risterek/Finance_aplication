@@ -10,8 +10,17 @@
 
   <h1>Moje finanse</h1>
 
+  <!-- Formularz budżetu -->
+  <div>
+    <label for="budget-input">Ustaw budżet miesięczny (PLN): </label>
+    <input type="number" id="budget-input" min="0" step="0.01" />
+    <button id="set-budget-btn">Ustaw budżet</button>
+    <p>Aktualny budżet: <span id="current-budget">0</span> PLN</p>
+  </div>
+
+  <!-- Formularz dodawania transakcji -->
   <form id="transaction-form">
-    <input type="text" id="description" placeholder="Opis" required />
+    <input type="text" id="description" placeholder="Nazwa transakcji" required />
     <input type="number" id="amount" placeholder="Kwota" required step="0.01" />
     <select id="category" required>
       <option value="" disabled selected>Wybierz kategorię</option>
@@ -20,18 +29,30 @@
       <option value="Rozrywka">Rozrywka</option>
       <option value="Inne">Inne</option>
     </select>
+    <select id="type" required>
+      <option value="" disabled selected>Typ transakcji</option>
+      <option value="expense">Wydatek</option>
+      <option value="income">Przychód</option>
+    </select>
     <button type="submit">Dodaj</button>
   </form>
 
-  <h2>Lista transakcji</h2>
-  <div id="transactions-list">
-    <!-- Transakcje pojawią się tutaj -->
-  </div>
+  <h2>Podsumowanie</h2>
+  <p>Wydatki: <span id="total-expenses">0</span> PLN</p>
+  <p>Przychody: <span id="total-incomes">0</span> PLN</p>
+  <p>Bilans (Przychody - Wydatki): <span id="balance">0</span> PLN</p>
+  <p>Budżet pozostały: <span id="budget-remaining">0</span> PLN</p>
 
-  <h2>Wydatki wg kategorii</h2>
+  <h2>Lista transakcji</h2>
+  <div id="transactions-list"></div>
+
+  <h2>Wydatki wg kategorii (słupkowy)</h2>
   <canvas id="categoryChart" width="400" height="200"></canvas>
 
-  <!-- Ładujemy Chart.js z CDN -->
+  <h2>Wydatki wg kategorii (kołowy)</h2>
+  <canvas id="pieChart" width="400" height="200"></canvas>
+
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
