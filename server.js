@@ -66,3 +66,24 @@ app.get('/api/transaction', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🌍 Serwer działa na porcie: ${PORT}`);
 });
+
+app.get('/api/summary', async (req, res) => {
+  try {
+    const transactions = await Transaction.find();
+
+    const summary = {};
+
+    transactions.forEach(t => {
+      if (!summary[t.category]) {
+        summary[t.category] = 0;
+      }
+      summary[t.category] += t.amount;
+    });
+
+    res.json(summary);
+  } catch (err) {
+    console.error("❌ Błąd podczas generowania podsumowania:", err.message);
+    res.status(500).json({ error: "Błąd serwera" });
+  }
+});
+
