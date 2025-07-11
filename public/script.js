@@ -7,12 +7,52 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Budżetowanie
+  let budget = localStorage.getItem('budget') ? parseFloat(localStorage.getItem('budget')) : 0;
+
+  document.getElementById('set-budget').addEventListener('click', () => {
+    const input = document.getElementById('budget-input');
+    const value = parseFloat(input.value);
+    if (!isNaN(value) && value >= 0) {
+      budget = value;
+      localStorage.setItem('budget', budget);
+      showBudgetInfo();
+      input.value = '';
+    } else {
+      alert('Podaj poprawną wartość budżetu');
+    }
+  });
+
+  function showBudgetInfo() {
+    const info = document.getElementById('budget-info');
+    // Oblicz sumę transakcji (kwoty)
+    let total = 0;
+    transactionsList.querySelectorAll('.transaction').forEach(t => {
+      const amountText = t.querySelector('div:nth-child(2)').textContent;
+      const amount = parseFloat(amountText.replace(/[^\d.-]/g, ''));
+      total += amount;
+    });
+
+    if (budget > 0) {
+      if (total > budget) {
+        info.textContent = `⚠️ Przekroczono budżet! Limit: ${budget} zł, Wydano: ${total.toFixed(2)} zł`;
+        info.style.color = 'red';
+      } else {
+        info.textContent = `✅ Pozostało: ${(budget - total).toFixed(2)} zł z budżetu ${budget} zł`;
+        info.style.color = 'green';
+      }
+    } else {
+      info.textContent = 'Brak ustawionego budżetu';
+      info.style.color = 'gray';
+    }
+  }
+
   // Funkcja do wyświetlania jednej transakcji
   function renderTransaction(transaction) {
     return `
       <div class="transaction">
         <div><strong>Opis:</strong> ${transaction.description}</div>
-        <div><strong>Kwota:</strong> ${transaction.amount} zł</div>
+        <div><strong>Kwota:</strong> ${transaction.amount.toFixed(2)} zł</div>
         <div><strong>Kategoria:</strong> <em>${transaction.category}</em></div>
         <hr>
       </div>
@@ -26,9 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error('Błąd podczas pobierania transakcji');
 
       const data = await res.json();
-      transactionsList.innerHTML = data
-        .map(renderTransaction)
-        .join('');
+      transactionsList.innerHTML = data.map(renderTransaction).join('');
+      showBudgetInfo();
     } catch (err) {
       transactionsList.innerHTML = `<p style="color:red;">${err.message}</p>`;
     }
@@ -57,64 +96,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error('Błąd podczas dodawania transakcji');
 
       form.reset();
-      await loadTransactions();
-      await renderChart(); // aktualizuj wykres po dodaniu nowej transakcji
+      loadTransactions();
 
     } catch (err) {
       alert(err.message);
     }
   });
 
-  // Funkcja do rysowania wykresu
-  async function renderChart() {
-    try {
-      const res = await fetch('/api/summary');
-      const summary = await res.json();
-
-      const categories = Object.keys(summary);
-      const values = Object.values(summary);
-
-      const ctx = document.getElementById('summary-chart').getContext('2d');
-
-      // Usuń poprzedni wykres, jeśli istnieje
-      if (window.categoryChart) {
-        window.categoryChart.destroy();
-      }
-
-      window.categoryChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: categories,
-          datasets: [{
-            label: 'Wydatki według kategorii',
-            data: values,
-            backgroundColor: [
-              '#FF6384', // Jedzenie
-              '#36A2EB', // Transport
-              '#FFCE56', // Rozrywka
-              '#4BC0C0', // Inne
-            ]
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            },
-            title: {
-              display: true,
-              text: 'Wydatki według kategorii'
-            }
-          }
-        }
-      });
-
-    } catch (err) {
-      console.error('Błąd pobierania danych do wykresu:', err);
-    }
-  }
-
   loadTransactions();
-  renderChart();
 });
