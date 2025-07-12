@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const labels = Object.keys(sums);
     const data = Object.values(sums);
-
     const ctx = document.getElementById('pieChart').getContext('2d');
     if (pieChart) pieChart.destroy();
 
@@ -52,14 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
           label: 'Wydatki',
           data,
           backgroundColor: [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+            '#FF6384',
+            '#36A2EB',
+            '#FFCE56',
+            '#4BC0C0',
+            '#9966FF',
+            '#FF9F40'
           ],
           borderColor: '#fff',
           borderWidth: 2
         }]
       },
       options: {
-        responsive: true
+        responsive: true,
       }
     });
   }
@@ -80,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
     totalIncomesDisplay.textContent = totalIncomes.toFixed(2);
     balanceDisplay.textContent = balance.toFixed(2);
     budgetRemainingDisplay.textContent = budgetRemaining.toFixed(2);
+
+    checkBudgetWarning(budgetRemaining);
   }
 
   async function loadTransactions() {
@@ -135,10 +141,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       form.reset();
       loadTransactions();
+
     } catch (err) {
       alert(err.message);
     }
   });
+
+  // 🔔 POWIADOMIENIA
+  function checkBudgetWarning(budgetRemaining) {
+    if (Notification.permission !== "granted") return;
+    if (budgetRemaining < 0) {
+      new Notification("💸 Budżet przekroczony!");
+    } else if (currentBudget > 0 && budgetRemaining < currentBudget * 0.2) {
+      new Notification("⚠️ Zbliżasz się do limitu budżetu!");
+    }
+  }
+
+  // 🔧 Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ Service Worker zarejestrowany'))
+      .catch(err => console.error('❌ Błąd rejestracji SW:', err));
+  }
+
+  if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+  }
 
   loadTransactions();
 });
