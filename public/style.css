@@ -3,62 +3,70 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #5a0af0;
+  background-color: #f9fafb;
   color: #111827;
 }
 
-h1, h2, h3, h4, h5 {
-  margin: 0;
+header {
+  background-color: #fff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-main {
+h1 {
+  font-size: 1.75rem;
+  color: #111827;
+}
+
+.user-info {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+main.layout {
+  display: flex;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  gap: 2rem;
 }
 
-/* Layout dashboardu */
-.dashboard {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+.left-panel, .right-panel {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
+.left-panel {
+  flex: 2;
+}
+
+.right-panel {
+  flex: 1.2;
+}
+
+/* Karty */
 .card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.card h2 {
-  font-size: 1rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
+.card h3 {
+  margin-bottom: 1rem;
+  color: #374151;
+  font-size: 1.25rem;
 }
 
-.card strong {
-  font-size: 1.5rem;
-  color: #111827;
-}
-
-.card.positive strong {
-  color: #16a34a;
-}
-
-.card.negative strong {
-  color: #dc2626;
-}
-
-.chart-section, .transactions-section {
-  grid-column: 1 / -1;
-}
-
+/* Formularz */
 form {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
 }
 
 form input, form select, form button {
@@ -66,6 +74,8 @@ form input, form select, form button {
   font-size: 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 form button {
@@ -80,19 +90,18 @@ form button:hover {
   background-color: #1d4ed8;
 }
 
+/* Lista transakcji */
 .transaction {
   background-color: #f3f4f6;
   padding: 1rem;
   border-radius: 0.5rem;
   margin-bottom: 1rem;
   line-height: 1.6;
+  border-left: 4px solid #6366f1;
 }
 
+/* Wykres */
 canvas {
   max-width: 100%;
   height: auto;
-  background-color: #fff;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
