@@ -1,17 +1,101 @@
+/* Reset i podstawowe style */
 body {
-  font-family: Arial;
-  max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fb;
+  color: #333;
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 10px;
+  color: #222;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+header h1 {
+  font-size: 1.6rem;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #2ecc71;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #27ae60;
+}
+
+.transactions {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.transaction {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+canvas {
+  background-color: #fff;
+  border-radius: 10px;
   padding: 20px;
 }
-form {
-  display: flex;
-  gap: 10px;
+
+.budget-info p {
+  margin: 8px 0;
+  font-size: 0.95rem;
 }
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  margin: 5px 0;
+
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr;
+  }
 }
