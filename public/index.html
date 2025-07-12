@@ -1,53 +1,49 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finanse App</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="icon-192.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Finansowy</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header class="navbar">
-    <div class="navbar-left">
-      <h1>Finanse App</h1>
-      <input type="search" placeholder="Szukaj...">
-    </div>
-    <div class="navbar-right">
-      <span class="user">👤 Maks</span>
+  <header>
+    <h1>Twój panel finansowy</h1>
+    <div class="user-info">
+      <span>Witaj, Użytkowniku</span>
     </div>
   </header>
 
   <main class="dashboard">
-    <section class="cards">
+    <!-- Panel główny -->
+    <section class="grid-overview">
       <div class="card">
-        <h2>Budżet całkowity</h2>
-        <p><span id="current-budget">0</span> PLN</p>
+        <h3>Twój bilans</h3>
+        <p><strong><span id="balance">0</span> PLN</strong></p>
       </div>
+
       <div class="card">
-        <h2>Przychody</h2>
-        <p><span id="total-incomes">0</span> PLN</p>
+        <h3>Ustaw budżet</h3>
+        <input type="number" id="budget-input" placeholder="Kwota" />
+        <button id="set-budget-btn">Ustaw</button>
+        <p>Budżet: <span id="current-budget">0</span> PLN</p>
+        <p>Pozostało: <span id="budget-remaining">0</span> PLN</p>
       </div>
+
       <div class="card">
-        <h2>Wydatki</h2>
-        <p><span id="total-expenses">0</span> PLN</p>
-      </div>
-      <div class="card">
-        <h2>Bilans</h2>
-        <p><span id="balance">0</span> PLN</p>
-      </div>
-      <div class="card">
-        <h2>Pozostały budżet</h2>
-        <p><span id="budget-remaining">0</span> PLN</p>
+        <h3>Podsumowanie</h3>
+        <p>Wydatki: <span id="total-expenses">0</span> PLN</p>
+        <p>Przychody: <span id="total-incomes">0</span> PLN</p>
       </div>
     </section>
 
-    <section class="form-section">
+    <!-- Formularz dodawania transakcji -->
+    <section class="card">
+      <h3>Dodaj transakcję</h3>
       <form id="transaction-form">
-        <input type="text" id="description" placeholder="Opis" required>
-        <input type="number" id="amount" placeholder="Kwota" step="0.01" required>
+        <input type="text" id="description" placeholder="Opis" required />
+        <input type="number" id="amount" placeholder="Kwota" required />
         <select id="category" required>
           <option value="" disabled selected>Kategoria</option>
           <option value="Jedzenie">Jedzenie</option>
@@ -57,25 +53,22 @@
         </select>
         <select id="type" required>
           <option value="" disabled selected>Typ</option>
-          <option value="income">Przychód</option>
           <option value="expense">Wydatek</option>
+          <option value="income">Przychód</option>
         </select>
         <button type="submit">Dodaj</button>
       </form>
-
-      <div class="budget-setter">
-        <input type="number" id="budget-input" placeholder="Ustaw budżet" min="0" step="0.01">
-        <button id="set-budget-btn">Zapisz budżet</button>
-      </div>
     </section>
 
-    <section class="transactions">
-      <h2>Lista transakcji</h2>
+    <!-- Lista transakcji -->
+    <section class="card">
+      <h3>Historia transakcji</h3>
       <div id="transactions-list"></div>
     </section>
 
-    <section class="chart-section">
-      <h2>Wydatki wg kategorii</h2>
+    <!-- Wykres -->
+    <section class="card">
+      <h3>Wydatki wg kategorii</h3>
       <canvas id="pieChart"></canvas>
     </section>
   </main>
